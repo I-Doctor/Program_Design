@@ -25,7 +25,10 @@ public:
 	bool Check(Position& position);//返回某位置是否可达
 	void Remove();//检测并消除行，包含分等级加分，固定后调用
 	Shape* CreatNew();//产生新方块，检查后调用
-	void ReachTop();//检测是否游戏结束，固定后调用、包含最高分提醒
-	friend Table& operator +(Table& table,Shape& shape);//固定运动方块，down到底后调用
+	bool ReachTop();//检测是否游戏结束，固定后调用、包含最高分提醒
+	void operator +(Position p)
+	{
+
+	}
 	void Fresh();
 };
