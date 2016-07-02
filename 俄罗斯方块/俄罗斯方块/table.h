@@ -1,10 +1,13 @@
 #pragma once
+//#include"shape.h"
+#include"struct.h"
 #include<iostream>
-#include"shape.h"
+#include<windows.h>
 #define HEIGHT 25
 #define WIDTH 14
 
 using namespace std;
+class Shape;
 
 class Table//游戏界面类，开始游戏后调用
 {
@@ -26,9 +29,10 @@ public:
 	void Remove();//检测并消除行，包含分等级加分，固定后调用
 	Shape* CreatNew();//产生新方块，检查后调用
 	bool ReachTop();//检测是否游戏结束，固定后调用、包含最高分提醒
-	void operator +(Position p)
-	{
 
-	}
+	//运算符无法重载
+//	void operator +(Position p)	{	}
+	friend Table Add(Table,Shape*);
+	void Newtable();
 	void Fresh();
 };

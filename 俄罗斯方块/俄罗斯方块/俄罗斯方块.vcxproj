@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="shape.h" />
+    <ClInclude Include="struct.h" />
     <ClInclude Include="table.h" />
   </ItemGroup>
   <ItemGroup>
