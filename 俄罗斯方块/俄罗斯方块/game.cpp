@@ -9,6 +9,8 @@
 #include<windows.h>
 
 using namespace std;
+
+
 //_————打印菜单——
 void Game::PrintMenu()
 {
@@ -65,30 +67,27 @@ void Game::Play()
 //	system("pause");
 	clock_t clocklast,clocknow;
 	clocklast=clock();
+/*	currenttable=Add(fixedtable,currentshape);
+	currenttable.Fresh();
+	*/
 
-	currenttable=Add(fixedtable,currentshape);//更新动态屏幕
-	currenttable.Fresh();//动态刷新屏幕
 	while(1)
 	{
 		//查询时间并检测
 		clocknow=clock();               
-		if(clocknow-clocklast>=0.6 * CLOCKS_PER_SEC)
+		if(clocknow-clocklast>=level * CLOCKS_PER_SEC)
 		{
 			clocklast=clocknow;
-			if(currentshape->Down(fixedtable))
-			{
-				currenttable=Add(fixedtable,currentshape);
-				currenttable.Fresh();
-			}
+			if(currentshape->Down(fixedtable)){}
 			else
 			{
 				fixedtable=Add(fixedtable,currentshape);
 				delete currentshape;
-				fixedtable.Fresh();//刷新屏幕
+//				fixedtable.Fresh();//刷新屏幕
 				fixedtable.Remove();
-				fixedtable.Fresh();//刷新屏幕
+//				fixedtable.Fresh();//刷新屏幕
 				if(fixedtable.ReachTop()){return ;}
-				else{currenttable=fixedtable;currentshape=NewShape();currenttable.Fresh();}//刷新屏幕
+				else{currentshape=nextshape;nextshape=NewShape();nextshape->PrintNext();}//刷新屏幕
 			}
 //+++			currenttable=fixedtable+*(currentshape);
 		}
@@ -114,8 +113,7 @@ void Game::Play()
 							break;
 						}
 					}
-					currenttable=Add(fixedtable,currentshape);
-					currenttable.Fresh();//动态刷新屏幕
+					currentshape->PrintRotate(fixedtable);//局部刷新旋转
 				break;
 				}
 			case 'a':
@@ -123,28 +121,20 @@ void Game::Play()
 			case '4':
 			case 75://左
 				currentshape->Left(fixedtable);
-				currenttable=Add(fixedtable,currentshape);
-				currenttable.Fresh();//动态刷新屏幕
 				break;
 			case 'S':
 			case 's':
 			case '2':
 			case 80://下
 				{
-					if(currentshape->Down(fixedtable))
-					{
-						currenttable=Add(fixedtable,currentshape);
-						currenttable.Fresh();
-					}
+					if(currentshape->Down(fixedtable)){}
 					else
 					{
 						fixedtable=Add(fixedtable,currentshape);
 						delete currentshape;
-						fixedtable.Fresh();//刷新屏幕
 						fixedtable.Remove();
-						fixedtable.Fresh();//刷新屏幕
 						if(fixedtable.ReachTop()){return ;}
-						else{currenttable=fixedtable;currentshape=NewShape();currenttable.Fresh();}//刷新屏幕
+						else{currentshape=nextshape;nextshape=NewShape();nextshape->PrintNext();}//刷新屏幕
 					}
 					break;
 				}
@@ -154,17 +144,12 @@ void Game::Play()
 			case (char)(77)://右
 				{
 					currentshape->Right(fixedtable);
-					currenttable=Add(fixedtable,currentshape);
-					*(currentshape);
-					currenttable.Fresh();//动态刷新屏幕
 					break;
 				}
 			default:
 				{
 					if(Pause())//暂停、返回1表示退出
-					{
-						return ;
-					}
+					{return ;}
 				}
 
 			}
@@ -277,6 +262,8 @@ void Game::NewGame()
 //	cout<<"tiaoshi"<<endl;
 	while(1)
 	{
+		system("cls");
+		cout<<"当前玩家："<<currentPlayer.name<<endl;
 		cout<<"1、开始新游戏	2、返回主菜单"<<endl;
 		int newgame;
 		cin>>newgame;
@@ -284,27 +271,34 @@ void Game::NewGame()
 		{
 //deletetiaoshi			delete currentshape;
 			currentshape=NewShape();
+			nextshape=NewShape();
 			fixedtable.Newtable();
-			//	cout<<"tiaoshi"<<endl;
+			PrintScreen();
+			nextshape->PrintNext();
+//	cout<<"tiaoshi"<<endl;
 			Play();
 		}
 		else
 		{break;}
 	}
 }
-//————从保存的开始，继续游戏————
+//————从保存的开始，继续游戏
 void Game::Continue()
 {
 	if(pause)
 	{
 		pause=0;
+		currentshape=NewShape();
+		nextshape=NewShape();
+		PrintScreen();
+		fixedtable.Printfixedtable();
+		nextshape->PrintNext();
 		Play();
 	}
 	else
 	{
 		int choose;
 		cout<<"没有存档，开始新游戏？"<<endl;
-		cout<<""<<endl;
 		cin>>choose;
 		if(choose==1)
 		{
@@ -364,23 +358,77 @@ void Game::ShowOperations()
 //————暂停后调用进行选择
 bool Game::Pause()
 {
-	system("CLS");
+	HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X=0;
+	pos.Y=HEIGHT-3;
+	SetConsoleCursorPosition(out,pos);
 	cout<<"已暂停，请选择："<<endl;
-	cout<<"1、继续游戏		2、保存并退出"<<endl;
+	cout<<"1、继续游戏    2、保存并退出  ";
 	int pausechoose;
 	cin>>pausechoose;
 	if(pausechoose==1)
-	{return 0;}
+	{
+		pos.X=0;
+		pos.Y=HEIGHT-3;
+		SetConsoleCursorPosition(out,pos);
+		cout<<"                   "<<endl;
+		pos.X=0;
+		pos.Y=HEIGHT-2;
+		SetConsoleCursorPosition(out,pos);    
+		cout<<"                                  "<<endl;
+		pos.X=0;
+		pos.Y=HEIGHT-3;
+		SetConsoleCursorPosition(out,pos);
+		return 0;}
 	else
 	{return 1;}
 }
-
-void Game::Screen()
+//————打印屏幕
+void Game::PrintScreen()
 {
-	cout<<"----------------------------------"<<endl;
-	cout<<"    ||当前分数： "<<currentPlayer.score<<endl;
-	currenttable.Fresh();
-	cout<<"----------------------------------"<<endl;
-	cout<<"    ||当前分数： "<<currentPlayer.score<<endl;
-	cout<<nextshape->Shownext;
+	system("CLS");
+	//第三行
+	for(int j=0;j<WIDTH+10;j++){cout<<"□";}cout<<endl;   //第三行
+	/*第四行*/
+	cout<<"□                        □   【下一图形】   □"<<endl;
+	/*五到十行*/
+	for(int i=5;i<11;i++)
+	{cout<<"□                        □                  □"<<endl;}
+	/*第11行*/
+	cout<<"□                        □□□□□□□□□□□"<<endl;
+	/*第12行*/
+	cout<<"□                        □   【当前分数】   □"<<endl;
+	/*13行，分数*/
+	cout<<"□                        □         ";
+	cout<<setiosflags(ios::left)<<setw(3)<<currentScore<<"      □"<<endl;
+	/*14*/
+	cout<<"□                        □                  □"<<endl;
+	/*第15~18行*/
+	cout<<"□                        □      1行：0      □"<<endl;
+	cout<<"□                        □      2行：0      □"<<endl;
+	cout<<"□                        □      3行：0      □"<<endl;
+	cout<<"□                        □      4行：0      □"<<endl;
+
+/*	cout<<"□                        □";
+	cout<<setiosflags(ios::right)<<setw(10)<<"3行：";
+	cout<<setiosflags(ios::left)<<setw(8)<<twoRow;  cout<<"□"<<endl;
+	cout<<"□                        □";
+	cout<<setiosflags(ios::right)<<setw(10)<<"3行：";
+	cout<<setiosflags(ios::left)<<setw(8)<<threeRow;  cout<<"□"<<endl;
+	cout<<"□                        □";
+	cout<<setiosflags(ios::right)<<setw(10)<<"4行：";
+	cout<<setiosflags(ios::left)<<setw(8)<<fourRow;  cout<<"□"<<endl;
+	*/
+	/*19行*/
+	cout<<"□                        □                  □"<<endl;
+	/*20行*/
+	cout<<"□                        □□□□□□□□□□□"<<endl;
+
+	/*21~23*/
+	cout<<"□                        □ 旋转：W  下降：S □"<<endl;
+	cout<<"□                        □ 左移：A  右移：D □"<<endl;
+	cout<<"□                        □                  □"<<endl;
+	/*24*/
+	cout<<"□□□□□□□□□□□□□□□□□□□□□□□□"<<endl;
 }

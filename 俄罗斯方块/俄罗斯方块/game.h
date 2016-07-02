@@ -60,6 +60,11 @@ class Game            //游戏类，主程序的载体
 private:
 	bool pause;
 	unsigned int currentScore;
+	unsigned int oneRow;
+	unsigned int twoRow;
+	unsigned int threeRow;
+	unsigned int fourRow;
+	double level;
 	Player currentPlayer;
 	Table currenttable;
 	Table fixedtable;
@@ -79,7 +84,7 @@ private:
 			void Play();//运行游戏逻辑，开始游戏后调用
 				void AddScore();
 				Shape* NewShape();
-				void Screen();
+				void PrintScreen();
 
 		void RankList();
 		void ChoosePlayer();//选择玩家
@@ -91,9 +96,15 @@ private:
 public:
 	Game()
 	{
+		level=0.55;
 		pause=0;
 		currentScore=0;
+		oneRow=0;
+		twoRow=0;
+		threeRow=0;
+		fourRow=0;
 		currentshape=NULL;
+		nextshape=NULL;
 	}
 	void Run();//包含整个程序
 };

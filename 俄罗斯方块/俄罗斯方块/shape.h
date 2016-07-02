@@ -29,10 +29,13 @@ public:
 	}
 	void Left(Table&);//向左移动
 	void Right(Table&);//向右移动
-	void Shownext();
 	bool Down(Table&);//向下移动，一个周期自动运行一次
 	virtual void Rotate(){}//旋转，按类型重载
 	virtual ~Shape(){}
+
+	void PrintNext();
+	void PrintRotate(Table&);//旋转后调用，检测旋转范围
+	void PrintNearby(int,Table&);//检查并打印大范围或小范围，bool=1是大范围
 	friend Table Add(Table,Shape*);
 };
 

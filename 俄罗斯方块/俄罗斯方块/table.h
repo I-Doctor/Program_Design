@@ -34,5 +34,6 @@ public:
 //	void operator +(Position p)	{	}
 	friend Table Add(Table,Shape*);
 	void Newtable();
-	void Fresh();
+	void Printfixedtable();
+//	void PrintRotate(Shape*);
 };

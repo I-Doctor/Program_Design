@@ -12,6 +12,7 @@ bool Table::Check(Position& position)
 	return t[position.row][position.column];
 }
 //刷新游戏池
+/*
 void Table::Fresh()
 {
 	system("CLS");
@@ -24,7 +25,7 @@ void Table::Fresh()
 			position.row=i;
 			position.column=j;
 			if(Check(position)==0){cout<<"  ";}
-			else{cout<<"□";}//■
+			else{cout<<"□";}■
 		}
 		cout<<"□";
 		cout<<endl;
@@ -33,6 +34,7 @@ void Table::Fresh()
 	for(int j=0;j<WIDTH;j++)
 	{cout<<"□";}
 }
+*/
 //落地后调用，消除一行
 void Table::Remove()
 {
@@ -95,4 +97,27 @@ void Table::Newtable()
 	}
 	for(int j=0;j<WIDTH;j++)
 	{t[HEIGHT-1][j]=1;}
+}
+
+void Table::Printfixedtable()
+{
+	HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+
+	for(int i=4;i<HEIGHT-1;i++)
+	{		
+		for(int j=1;j<WIDTH-1;j++)
+		{
+			if(t[i][j])
+			{
+				pos.X=2*j;	
+				pos.Y=i-3;
+				SetConsoleCursorPosition(out,pos);
+				cout<<"■";
+			}
+		}
+	}
+	pos.X=0;
+	pos.Y=HEIGHT-3;
+	SetConsoleCursorPosition(out,pos);
 }
