@@ -1,3 +1,10 @@
+/*************************************************************************
+    > File Name: game.cpp
+	> Orgnization:Tsinghua University
+    > Author: ÖÓ¿­ 2015011158
+    > Mail: ZK14115@163.com 
+    > Created Time: 2016.7.7 ÐÇÆÚËÄ
+ ************************************************************************/
 #include"struct.h"
 #include"shape.h"
 #include"game.h"
@@ -530,7 +537,7 @@ void Game::PrintScreen()
 	/*21~23*/
 	cout<<"¡õ                        ¡õ Ðý×ª£ºW  ÏÂ½µ£ºS ¡õ"<<endl;
 	cout<<"¡õ                        ¡õ ×óÒÆ£ºA  ÓÒÒÆ£ºD ¡õ"<<endl;
-	cout<<"¡õ                        ¡õ                  ¡õ"<<endl;
+	cout<<"¡õ                        ¡õ       by:ZK      ¡õ"<<endl;
 	/*24*/
 	cout<<"¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ¡õ"<<endl;
 }

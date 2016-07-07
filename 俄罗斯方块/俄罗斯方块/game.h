@@ -1,3 +1,10 @@
+/*************************************************************************
+    > File Name: game.h
+	> Orgnization:Tsinghua University
+    > Author: ÖÓ¿­ 2015011158
+    > Mail: ZK14115@163.com 
+    > Created Time: 2016.7.7 ĞÇÆÚËÄ
+ ************************************************************************/
 #pragma once
 #include"struct.h"
 #include"shape.h"

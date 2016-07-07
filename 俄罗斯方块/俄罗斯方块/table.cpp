@@ -1,3 +1,10 @@
+/*************************************************************************
+    > File Name: table.cpp
+	> Orgnization:Tsinghua University
+    > Author: 钟凯 2015011158
+    > Mail: ZK14115@163.com 
+    > Created Time: 2016.7.7 星期四
+ ************************************************************************/
 #include"struct.h"
 #include"table.h"
 #include"shape.h"
@@ -122,7 +129,7 @@ void Table::Newtable()
 	for(int j=0;j<WIDTH;j++)
 	{t[HEIGHT-1][j]=1;}
 }
-
+//初始化界面打印已有游戏池
 void Table::Printfixedtable()
 {
 	HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);

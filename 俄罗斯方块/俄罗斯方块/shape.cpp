@@ -1,4 +1,10 @@
-
+/*************************************************************************
+    > File Name: shape.cpp
+	> Orgnization:Tsinghua University
+    > Author: 钟凯 2015011158
+    > Mail: ZK14115@163.com 
+    > Created Time: 2016.7.7 星期四
+ ************************************************************************/
 #include"struct.h"
 #include"shape.h"
 #include<windows.h>
@@ -141,7 +147,7 @@ bool Shape::Down(Table& table)//向下移动，一个周期自动运行一次
 	SetConsoleCursorPosition(out,pos);
 	return 1;
 }
-
+//打印出下一个图形
 void Shape::PrintNext()
 {
 	HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);
@@ -167,7 +173,7 @@ void Shape::PrintNext()
 	//tiaoshi
 //	cout<<"next over";
 }
-
+//确定旋转后的打印范围
 void Shape::PrintRotate(Table& table)
 {
 	if(position[3].column-position[0].column==3||position[0].row-position[3].row==3
@@ -180,7 +186,7 @@ void Shape::PrintRotate(Table& table)
 		PrintNearby(1,table);
 	}
 }
-
+//打印旋转后的范围
 void Shape::PrintNearby(int n,Table& table)
 {
 	Position check;
