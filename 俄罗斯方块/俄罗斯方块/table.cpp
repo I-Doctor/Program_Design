@@ -35,29 +35,53 @@ void Table::Fresh()
 	{cout<<"□";}
 }
 */
-//落地后调用，消除一行
-void Table::Remove()
+//落地后调用，检测是否消除一行，返回消除行数
+int Table::Remove()
 {
 	int rownumber=0;
-	for(int i=0;i<HEIGHT-1;i++)
+	for(int i=4;i<HEIGHT-1;i++)
 	{
 		bool flag=1;
-		for(int j=0;j<WIDTH-1;j++)
+		for(int j=1;j<WIDTH-1;j++)
 		{
 			if(t[i][j]==0)
 			{flag=0;break;}
 		}
 		if(flag==1)
 		{
+			HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);
+			COORD pos;
+			DWORD len;
 			rownumber++;
-			for(int k=i-1;k>=0;k--)
+			for(int k=i;k>3;k--)
 			{
+				pos.X=2;
+				pos.Y=k-3;
+				FillConsoleOutputCharacter(out,L' ',2*(WIDTH-2),pos,&len);
 				for(int l=1;l<WIDTH-1;l++)
 				{
-					t[k+1][l]=t[k][l];
+					t[k][l]=t[k-1][l];
+					if(t[k][l])
+					{
+						pos.X=2*(l);
+						pos.Y=(k-3);
+						SetConsoleCursorPosition(out,pos);
+						cout<<"■";
+					}
 				}
 			}
+			pos.X=0;
+			pos.Y=HEIGHT-3;
+			SetConsoleCursorPosition(out,pos);
 		}
+	}
+	if(rownumber<5)
+	{return rownumber;	}
+	else
+	{
+		cerr<<"remove error!"<<endl;
+		system("pause");
+		return 0;
 	}
 }
 //检测是否结束，返回1为结束
@@ -69,7 +93,7 @@ bool Table::ReachTop()
 		else
 		{
 			system("CLS");
-			cout<<"GAME OVER!"<<endl;
+			cout<<"    ***GAME OVER!***"<<endl;
 			return 1;
 		}
 	}

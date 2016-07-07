@@ -3,7 +3,9 @@
 #include"game.h"
 #include"table.h"
 
+#include<cmath>
 #include<iostream>
+#include<fstream>
 #include<iomanip>
 #include<conio.h>
 #include<windows.h>
@@ -23,12 +25,21 @@ void Game::PrintMenu()
 	cout<<"1、新游戏"<<'\t'<<"2、继续游戏"<<'\t'<<"3、排行榜"<<endl;
 	cout<<"4、选择玩家"<<'\t'<<"5、控制说明"<<'\t'<<"6、退出游戏"<<endl;
 	cout<<"-----------------------------------------------------"<<endl;
+	//tiaoshi
+	//cout<<currentPlayer.name;
+
 }
 //————运行游戏程序——读取数据并判断
 void Game::Run()
 {
-
-	//Read();
+	Read();
+	clock_t start;
+	start=clock();
+	while(1)
+	{
+		if((clock()-start)>=(2*CLOCKS_PER_SEC))
+		{break;}
+	}
 	Welcome();
 }
 //————菜单选择————
@@ -47,7 +58,7 @@ void Game::Welcome()
 		case 4:{ChoosePlayer();break;}
 		case 5:{ShowOperations();break;}
 		default:{
-			//Save();
+			Save();
 			clock_t start;
 			start=clock();
 			cout<<"BYE-BYE!";
@@ -67,6 +78,7 @@ void Game::Play()
 //	system("pause");
 	clock_t clocklast,clocknow;
 	clocklast=clock();
+	int addscore=0;
 /*	currenttable=Add(fixedtable,currentshape);
 	currenttable.Fresh();
 	*/
@@ -78,15 +90,19 @@ void Game::Play()
 		if(clocknow-clocklast>=level * CLOCKS_PER_SEC)
 		{
 			clocklast=clocknow;
-			if(currentshape->Down(fixedtable)){}
+		if(currentshape->Down(fixedtable)){}
 			else
 			{
 				fixedtable=Add(fixedtable,currentshape);
 				delete currentshape;
 //				fixedtable.Fresh();//刷新屏幕
-				fixedtable.Remove();
+				addscore=fixedtable.Remove();
+				if(addscore)
+				{AddScore(addscore);}
+				addscore=0;
 //				fixedtable.Fresh();//刷新屏幕
-				if(fixedtable.ReachTop()){return ;}
+				if(fixedtable.ReachTop())
+				{return ;}
 				else{currentshape=nextshape;nextshape=NewShape();nextshape->PrintNext();}//刷新屏幕
 			}
 //+++			currenttable=fixedtable+*(currentshape);
@@ -132,7 +148,10 @@ void Game::Play()
 					{
 						fixedtable=Add(fixedtable,currentshape);
 						delete currentshape;
-						fixedtable.Remove();
+						addscore=fixedtable.Remove();
+						if(addscore)
+						{AddScore(addscore);}
+						addscore=0;
 						if(fixedtable.ReachTop()){return ;}
 						else{currentshape=nextshape;nextshape=NewShape();nextshape->PrintNext();}//刷新屏幕
 					}
@@ -162,9 +181,41 @@ void Game::Play()
 //————显示玩家列表————
 void List::ShowList()
 {
-	cout<<"名次"<<"      "<<"名字"<<"       "<<"分数"<<endl;
+	/*先排序*/
+	Player* sortplayer1=head;
+	Player* sortplayer2;
+	for(unsigned int i=1;i<nodenumber-1;i++)
+	{
+		sortplayer1=head;
+		if(head==NULL)
+		{}
+		else
+	{
+		sortplayer2=head->next;
+		if(head->score<head->next->score)
+		{
+				head->next=sortplayer2->next;
+				head=sortplayer2;
+				head->next=sortplayer1;
+		}
+		for(unsigned int j=1;j<(nodenumber-i);j++)
+		{
+			if(sortplayer2->score<sortplayer2->next->score )
+			{
+				sortplayer1->next=sortplayer2->next;
+				sortplayer2->next=sortplayer2->next->next;
+				sortplayer1->next->next=sortplayer2;
+				sortplayer2=sortplayer1->next;
+			}
+			sortplayer1=sortplayer2;
+			sortplayer2=sortplayer2->next;
+		}
+	}
+	}
+	/*再输出*/
+	cout<<"名次"<<"      "<<"名字"<<"       "<<"最高分数"<<endl;
 	Player* outputplayer=head;
-	for(int i=0;i<nodenumber;i++)
+	for(unsigned int i=0;i<nodenumber;i++)
 	{
 		if(outputplayer!=NULL)
 		{
@@ -178,36 +229,55 @@ void List::ShowList()
 //————选择玩家————
 void Game::ChoosePlayer()
 {
-	int choose;
+	unsigned int choose;
 	system("CLS");
+	cout<<"||注意：切换玩家将失去当前暂停的游戏||"<<endl;
 	cout<<"当前玩家："<<'\t'<<currentPlayer.name<<endl;
-	cout<<"请输入序号选择玩家，或输入0新建"<<endl;
+	cout<<"请输入序号选择玩家，输入0新建，输入-1返回"<<endl;
 	playerlist.ShowList();
 	cin>>choose;
 	if(choose<=playerlist.nodenumber&&choose>0)
 	{
 		Player* chooseplayer=playerlist.head;
-		for(int i=0;i<choose;i++)
+		for(unsigned int i=1;i<choose;i++)
 		{
-			if(chooseplayer!=NULL)
+			if(chooseplayer->next!=NULL)
 			{
-				(currentPlayer)=*(chooseplayer);
 				chooseplayer=chooseplayer->next;
 			}
 			else{break;}
 		}
+		if(strcmp(currentPlayer.name,chooseplayer->name))
+		{
+			pause=0;
+		}
+		currentPlayer=*(chooseplayer);
 		currentPlayer.next=NULL;
 	}
 	else if(choose==0)//新建
 	{
 		while(1)
 		{
+			Player chooseplayer;
 			cout<<"请输入姓名(10字符以内)：";
-			cin>>currentPlayer.name;
+			cin>>chooseplayer.name;
+			bool toolong=1;
 			for(int i=0;i<10;i++)                          //检查是否超限
 			{
-				if(currentPlayer.name[i]=='\0')               //未超限
+				if(chooseplayer.name[i]=='\0')               //未超限
 				{
+					toolong=0;
+					Player* compareplayer=playerlist.head;                  //检查是否重名
+					bool samename=0;
+					for(int j=0;j<playerlist.nodenumber;j++)
+					{
+						if(!strcmp(chooseplayer.name,compareplayer->name))
+						{samename=1;break;}
+						compareplayer=compareplayer->next;
+					}
+					if(samename)
+					{cout<<"姓名已存在！"<<endl;break;}
+					//不重名
 					Player** addplayer=&(playerlist.head);
 					for(int j=0;;j++)
 					{
@@ -215,30 +285,38 @@ void Game::ChoosePlayer()
 						{
 							addplayer=&((*(addplayer))->next);
 						}
-						else
+						else//输入新玩家成功
 						{
 							(*(addplayer))=new Player;
-							(*(*(addplayer)))=currentPlayer;
+							(*(*(addplayer)))=chooseplayer;
 							playerlist.nodenumber+=1;
+							currentPlayer=chooseplayer;
+
 							break;
 						}
 					}
 					return;
 				}
 			}
-			                               //for中未退出，说明超限
-			cout<<"用户名过长，   "<<endl;
-			currentPlayer.name[0]='n';
-			currentPlayer.name[1]='o';
-			currentPlayer.name[2]=' ';
-			currentPlayer.name[3]='p';
-			currentPlayer.name[4]='l';
-			currentPlayer.name[5]='a';
-			currentPlayer.name[6]='y';
-			currentPlayer.name[7]='e';
-			currentPlayer.name[8]='r';
-			currentPlayer.name[10]=0;
+			if(toolong)//超限
+			{
+				cout<<"用户名过长，   "<<endl;
+				chooseplayer.name[0]='n';
+				chooseplayer.name[1]='o';
+				chooseplayer.name[2]=' ';
+				chooseplayer.name[3]='p';
+				chooseplayer.name[4]='l';
+				chooseplayer.name[5]='a';
+				chooseplayer.name[6]='y';
+				chooseplayer.name[7]='e';
+				chooseplayer.name[8]='r';
+				chooseplayer.name[10]='\0';
+			}
 		}
+	}
+	else if(choose==-1)
+	{
+		return;
 	}
 	else
 	{
@@ -257,8 +335,16 @@ void Game::ChoosePlayer()
 //————新游戏————
 void Game::NewGame()
 {
-	
-	ChoosePlayer();
+	if((currentPlayer.name[0])=='n'&&
+		currentPlayer.name[1]=='o'&&
+		currentPlayer.name[2]==' '&&
+		currentPlayer.name[3]=='p'&&
+		currentPlayer.name[4]=='l'&&
+		currentPlayer.name[5]=='a'&&
+		currentPlayer.name[6]=='y'&&
+		currentPlayer.name[7]=='e'&&
+		currentPlayer.name[8]=='r')
+	{ChoosePlayer();}
 //	cout<<"tiaoshi"<<endl;
 	while(1)
 	{
@@ -267,8 +353,10 @@ void Game::NewGame()
 		cout<<"1、开始新游戏	2、返回主菜单"<<endl;
 		int newgame;
 		cin>>newgame;
-		if(newgame==1)
+		if(newgame==1)              //开始新游戏，则初始化
 		{
+			pause=0;
+			currentScore=oneRow=twoRow=threeRow=fourRow=0;
 //deletetiaoshi			delete currentshape;
 			currentshape=NewShape();
 			nextshape=NewShape();
@@ -299,6 +387,7 @@ void Game::Continue()
 	{
 		int choose;
 		cout<<"没有存档，开始新游戏？"<<endl;
+		cout<<"   1.是    2.返回     ";
 		cin>>choose;
 		if(choose==1)
 		{
@@ -332,7 +421,7 @@ Shape* Game::NewShape()
 //	cout<<"  ";
 	return shape;
 }
-//————排行榜
+//————打印排行榜
 void Game::RankList()
 {
 	cout<<"———————————"<<endl;
@@ -382,9 +471,14 @@ bool Game::Pause()
 		SetConsoleCursorPosition(out,pos);
 		return 0;}
 	else
-	{return 1;}
+	{
+		pause=1;
+		//tiaoshi
+		Save();
+		return 1;
+	}
 }
-//————打印屏幕
+//————打印游戏界面屏幕
 void Game::PrintScreen()
 {
 	system("CLS");
@@ -405,10 +499,18 @@ void Game::PrintScreen()
 	/*14*/
 	cout<<"□                        □                  □"<<endl;
 	/*第15~18行*/
-	cout<<"□                        □      1行：0      □"<<endl;
-	cout<<"□                        □      2行：0      □"<<endl;
-	cout<<"□                        □      3行：0      □"<<endl;
-	cout<<"□                        □      4行：0      □"<<endl;
+	cout<<"□                        □      1行：";
+	cout<<setw(3)<<oneRow;
+	cout<<"    □"<<endl;
+	cout<<"□                        □      2行：";
+	cout<<setw(3)<<twoRow;
+	cout<<"    □"<<endl;
+	cout<<"□                        □      3行：";
+	cout<<setw(3)<<threeRow;
+	cout<<"    □"<<endl;
+	cout<<"□                        □      4行：";
+	cout<<setw(3)<<fourRow;
+	cout<<"    □"<<endl;
 
 /*	cout<<"□                        □";
 	cout<<setiosflags(ios::right)<<setw(10)<<"3行：";
@@ -431,4 +533,163 @@ void Game::PrintScreen()
 	cout<<"□                        □                  □"<<endl;
 	/*24*/
 	cout<<"□□□□□□□□□□□□□□□□□□□□□□□□"<<endl;
+}
+//————在游戏中实时显示分数,新纪录更新
+void Game::AddScore(const int& n)
+{
+	currentScore+=(int)(pow(2,n));
+
+	HANDLE  out=GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X=2*WIDTH+9;
+	pos.Y=10;
+	SetConsoleCursorPosition(out,pos);
+	cout<<setiosflags(ios::left)<<setw(3)<<currentScore;
+	if(currentScore>(currentPlayer.score))
+	{
+		pos.X=2*WIDTH+5;
+		pos.Y=11;
+		SetConsoleCursorPosition(out,pos);
+		cout<<"新纪录！";
+		Player* updateplayer=playerlist.head;
+		for(unsigned int i=0;updateplayer!=NULL&&(i<playerlist.nodenumber);i++)
+		{
+			bool same=1;
+			for(int j=0;(j<10)&&(updateplayer->name[j]!='\0');j++)
+			{
+				if(updateplayer->name[j]!=currentPlayer.name[j])
+				{
+					same=0;
+					break;
+				}
+				else if(updateplayer->name[j]=='\0')
+				{break;}
+			}
+
+			if(same==1)
+			{
+				updateplayer->score=currentPlayer.score=currentScore;
+				break;
+			}
+			else{updateplayer=updateplayer->next;}
+		}
+	}
+	switch(n)
+	{
+	case 1:
+		{
+			oneRow+=1;
+			pos.X=2*WIDTH+11;
+			pos.Y=12;
+			SetConsoleCursorPosition(out,pos);
+			cout<<oneRow;
+			break;
+		}
+	case 2:
+		{
+			twoRow+=1;
+			pos.X=2*WIDTH+11;
+			pos.Y=13;
+			SetConsoleCursorPosition(out,pos);
+			cout<<twoRow;
+			break;
+		}
+	case 3:
+		{
+			threeRow+=1;
+			pos.X=2*WIDTH+11;
+			pos.Y=14;
+			SetConsoleCursorPosition(out,pos);
+			cout<<threeRow;
+			break;
+		}
+	case 4:
+		{
+			fourRow+=1;
+			pos.X=2*WIDTH+11;
+			pos.Y=15;
+			SetConsoleCursorPosition(out,pos);
+			cout<<fourRow;
+			break;
+		}
+	default:
+		cerr<<"error!"<<endl;
+		system("pause");
+	}
+	pos.X=0;
+	pos.Y=HEIGHT-3;
+	SetConsoleCursorPosition(out,pos);
+}
+//————保存
+void Game::Save()
+{
+	fstream save("data.txt",ios_base::out|ios::binary);
+	if(!save)
+	{cerr<<"fail to open!"<<endl;system("pause");}
+	else
+	{
+		save.write((char*)&playerlist.nodenumber,sizeof(unsigned int));
+		Player* saveplayer=playerlist.head;
+		for(unsigned int i=0;(i<playerlist.nodenumber)&&(saveplayer!=NULL);i++)
+		{
+			save.write((char*)saveplayer,sizeof(Player));
+			saveplayer=saveplayer->next;
+		}
+		save.write((char*)&pause,sizeof(bool));
+		if(pause==1)
+		{
+			save.write((char*)&currentScore,sizeof(unsigned int));
+			save.write((char*)&oneRow,sizeof(unsigned int));
+			save.write((char*)&twoRow,sizeof(unsigned int));
+			save.write((char*)&threeRow,sizeof(unsigned int));
+			save.write((char*)&fourRow,sizeof(unsigned int));
+			save.write((char*)&level,sizeof(double));
+			save.write((char*)&currentPlayer,sizeof(Player));
+			save.write((char*)&fixedtable,sizeof(Table));
+		}
+		save.seekp(0,ios::beg);
+		save.close();
+//		cout<<"save.tiaoshi"<<endl;
+	}
+}
+//————读取数据
+void Game::Read()
+{
+	fstream read;
+	read.open("data.txt",ios::in|ios::binary);
+	if(!read)
+	{cout<<"没有存盘文件，稍后进行全新游戏"<<endl;}//system("pause");}
+	else
+	{
+		read.seekg(0,ios::beg);
+		read.read((char*)&playerlist.nodenumber,sizeof(unsigned int));
+		if(playerlist.nodenumber>0)
+		{
+			playerlist.head=new Player;
+			Player* readplayer=playerlist.head;
+			read.read((char*)playerlist.head,sizeof(Player));
+			for(unsigned int i=1;(i<playerlist.nodenumber);i++)
+			{
+				readplayer->next=new Player;
+				read.read((char*)(readplayer->next),sizeof(Player));
+				readplayer=readplayer->next;
+			}
+		}
+
+		read.read((char*)&pause,sizeof(bool));
+		if(pause==1)
+		{
+			read.read((char*)&currentScore,sizeof(unsigned int));
+			read.read((char*)&oneRow,sizeof(unsigned int));
+			read.read((char*)&twoRow,sizeof(unsigned int));
+			read.read((char*)&threeRow,sizeof(unsigned int));
+			read.read((char*)&fourRow,sizeof(unsigned int));
+			read.read((char*)&level,sizeof(double));
+			read.read((char*)&currentPlayer,sizeof(Player));
+			read.read((char*)&fixedtable,sizeof(Table));
+		}
+		cout<<"数据载入成功，马上开始"<<endl;
+//		system("pause");
+	}	
+	read.close();
 }
