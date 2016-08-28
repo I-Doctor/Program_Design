@@ -66,12 +66,12 @@ class Game            //游戏类，主程序的载体
 {
 private:
 	bool pause;
+	double level;
 	unsigned int currentScore;
 	unsigned int oneRow;
 	unsigned int twoRow;
 	unsigned int threeRow;
 	unsigned int fourRow;
-	double level;
 	Player currentPlayer;
 	Table currenttable;
 	Table fixedtable;

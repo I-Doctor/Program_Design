@@ -19,7 +19,6 @@
 
 using namespace std;
 
-
 //_¡ª¡ª¡ª¡ª´òÓ¡²Ëµ¥¡ª¡ª
 void Game::PrintMenu()
 {
