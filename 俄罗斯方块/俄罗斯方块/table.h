@@ -12,7 +12,6 @@
 #include<windows.h>
 #define HEIGHT 25
 #define WIDTH 14
-
 using namespace std;
 class Shape;
 
